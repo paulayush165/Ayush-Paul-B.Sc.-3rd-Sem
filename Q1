@@ -1,0 +1,68 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+
+template <typename T>
+int linear_search(const vector<T>& arr, const T& key) {
+    for (size_t i = 0; i < arr.size(); ++i) {
+        if (arr[i] == key) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+template <typename T>
+int binary_search(const vector<T>& arr, const T& key) {
+    int low = 0, high = arr.size() - 1;
+
+    while (low <= high) {
+        int mid = (low + high) / 2;
+
+        if (arr[mid] == key) {
+            return mid;
+        } else if (arr[mid] < key) {
+            low = mid + 1;
+        } else {
+            high = mid - 1;
+        }
+    }
+
+    return -1;
+}
+
+int main() {
+    vector<int> intVector = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+
+    int choice;
+    cout << "Choose search method:\n";
+    cout << "1. Linear Search\n";
+    cout << "2. Binary Search\n";
+    cout << "Enter your choice (1 or 2): ";
+    cin >> choice;
+
+    int key;
+    cout << "Enter the element to search: ";
+    cin >> key;
+
+    int index;
+    switch (choice) {
+        case 1:
+            index = linear_search(intVector, key);
+            break;
+        case 2:
+            index = binary_search(intVector, key);
+            break;
+        default:
+            std::cout << "Invalid choice\n";
+            return 1;
+    }
+
+    if (index != -1) {
+        cout << "Element found at index: " << index << std::endl;
+    } else {
+        cout << "Element not found\n";
+    }
+
+    return 0;
+}
