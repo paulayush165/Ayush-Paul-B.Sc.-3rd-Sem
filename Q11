@@ -1,0 +1,76 @@
+#include <stdio.h>
+
+// Function to calculate factorial using recursion
+unsigned long long recursiveFactorial(int n) {
+    if (n == 0 || n == 1) {
+        return 1;
+    } else {
+        return n * recursiveFactorial(n - 1);
+    }
+}
+
+// Function to calculate factorial using iteration
+unsigned long long iterativeFactorial(int n) {
+    unsigned long long result = 1;
+
+    for (int i = 1; i <= n; ++i) {
+        result *= i;
+    }
+
+    return result;
+}
+
+// Function to compute factors using recursion
+void recursiveFactors(int n, int currentFactor) {
+    if (currentFactor > n) {
+        return;
+    }
+
+    if (n % currentFactor == 0) {
+        printf("%d ", currentFactor);
+    }
+
+    recursiveFactors(n, currentFactor + 1);
+}
+
+// Function to compute factors using iteration
+void iterativeFactors(int n) {
+    printf("Factors of %d: ", n);
+
+    for (int i = 1; i <= n; ++i) {
+        if (n % i == 0) {
+            printf("%d ", i);
+        }
+    }
+
+    printf("\n");
+}
+
+int main() {
+    int number;
+
+    // Input
+    printf("Enter a non-negative integer: ");
+    scanf("%d", &number);
+
+    if (number < 0) {
+        printf("Please enter a non-negative integer.\n");
+        return 1;
+    }
+
+    // Calculate and display factorial using recursion
+    printf("Factorial of %d (using recursion): %llu\n", number, recursiveFactorial(number));
+
+    // Calculate and display factorial using iteration
+    printf("Factorial of %d (using iteration): %llu\n", number, iterativeFactorial(number));
+
+    // Compute and display factors using recursion
+    printf("Factors of %d (using recursion): ", number);
+    recursiveFactors(number, 1);
+    printf("\n");
+
+    // Compute and display factors using iteration
+    iterativeFactors(number);
+
+    return 0;
+}

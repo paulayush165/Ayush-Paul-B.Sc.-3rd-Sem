@@ -1,0 +1,144 @@
+#include <iostream>
+using namespace std;
+template <typename T>
+class Node {
+public:
+    T data;
+    Node* next;
+
+    Node(T value) : data(value), next(nullptr) {}
+};
+
+template <typename T>
+class LinkedList {
+private:
+    Node<T>* head;
+
+public:
+    LinkedList() : head(nullptr) {}
+
+    void insert(T value) {
+        Node<T>* newNode = new Node<T>(value);
+
+        if (head == nullptr) {
+            head = newNode;
+        } else {
+            Node<T>* temp = head;
+            while (temp->next != nullptr) {
+                temp = temp->next;
+            }
+            temp->next = newNode;
+        }
+    }
+
+    void deleteNode(T value) {
+        Node<T>* current = head;
+        Node<T>* prev = nullptr;
+
+        while (current != nullptr && current->data != value) {
+            prev = current;
+            current = current->next;
+        }
+
+        if (current == nullptr) {
+           cout << "Element not found in the list." << std::endl;
+            return;
+        }
+
+        if (prev == nullptr) {
+            head = current->next;
+        } else {
+            prev->next = current->next;
+        }
+
+        delete current;
+    }
+
+    bool search(T value) {
+        Node<T>* current = head;
+
+        while (current != nullptr) {
+            if (current->data == value) {
+                return true;
+            }
+            current = current->next;
+        }
+
+        return false;
+    }
+
+    void reverse() {
+        Node<T>* prev = nullptr;
+        Node<T>* current = head;
+        Node<T>* nextNode = nullptr;
+
+        while (current != nullptr) {
+            nextNode = current->next;
+            current->next = prev;
+            prev = current;
+            current = nextNode;
+        }
+
+        head = prev;
+    }
+
+    LinkedList<T> concatenate(const LinkedList<T>& otherList) const {
+        LinkedList<T> result = *this;  // Create a copy of the current list
+
+        Node<T>* current = otherList.head;
+        while (current != nullptr) {
+            result.insert(current->data);
+            current = current->next;
+        }
+
+        return result;
+    }
+
+    LinkedList<T> operator+(const LinkedList<T>& otherList) const {
+        return concatenate(otherList);
+    }
+
+    void display() const {
+        Node<T>* current = head;
+        while (current != nullptr) {
+           cout << current->data << " ";
+            current = current->next;
+        }
+      cout << std::endl;
+    }
+
+    ~LinkedList() {
+        Node<T>* current = head;
+        Node<T>* nextNode = nullptr;
+
+        while (current != nullptr) {
+            nextNode = current->next;
+            delete current;
+            current = nextNode;
+        }
+    }
+};
+
+int main() {
+    LinkedList<int> list1;
+    list1.insert(1);
+    list1.insert(2);
+    list1.insert(3);
+
+    LinkedList<int> list2;
+    list2.insert(4);
+    list2.insert(5);
+    list2.insert(6);
+
+    cout << "List 1: ";
+    list1.display();
+
+    cout << "List 2: ";
+    list2.display();
+
+    LinkedList<int> concatenatedList = list1 + list2;
+    cout << "Concatenated List: ";
+    concatenatedList.display();
+
+    return 0;
+}

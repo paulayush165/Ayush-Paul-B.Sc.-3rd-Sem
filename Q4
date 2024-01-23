@@ -1,0 +1,133 @@
+#include <iostream>
+using namespace std;
+template <typename T>
+class Node {
+public:
+    T data;
+    Node* next;
+    Node* prev;
+
+    Node(T value) : data(value), next(nullptr), prev(nullptr) {}
+};
+
+template <typename T>
+class DoublyLinkedList {
+private:
+    Node<T>* head;
+    Node<T>* tail;
+
+public:
+    DoublyLinkedList() : head(nullptr), tail(nullptr) {}
+
+    // Function to insert a new element at the end of the list
+    void insert(T value) {
+        Node<T>* newNode = new Node<T>(value);
+
+        if (head == nullptr) {
+            head = tail = newNode;
+        } else {
+            tail->next = newNode;
+            newNode->prev = tail;
+            tail = newNode;
+        }
+    }
+
+    // Function to delete a specific element from the list
+    void deleteNode(T value) {
+        Node<T>* current = head;
+
+        while (current != nullptr && current->data != value) {
+            current = current->next;
+        }
+
+        if (current == nullptr) {
+            cout << "Element not found in the list." << std::endl;
+            return;
+        }
+
+        if (current->prev != nullptr) {
+            current->prev->next = current->next;
+        } else {
+            head = current->next;
+        }
+
+        if (current->next != nullptr) {
+            current->next->prev = current->prev;
+        } else {
+            tail = current->prev;
+        }
+
+        delete current;
+    }
+
+    // Function to search for a specific element in the list
+    bool search(T value) {
+        Node<T>* current = head;
+
+        while (current != nullptr) {
+            if (current->data == value) {
+                return true;
+            }
+            current = current->next;
+        }
+
+        return false;
+    }
+
+    // Function to reverse the doubly linked list
+    void reverse() {
+        Node<T>* temp = nullptr;
+        Node<T>* current = head;
+
+        while (current != nullptr) {
+            temp = current->prev;
+            current->prev = current->next;
+            current->next = temp;
+            current = current->prev;
+        }
+
+        if (temp != nullptr) {
+            head = temp->prev;
+        }
+    }
+
+    // Function to display the elements of the doubly linked list
+    void display() const {
+        Node<T>* current = head;
+        while (current != nullptr) {
+           cout << current->data << " ";
+            current = current->next;
+        }
+        cout << std::endl;
+    }
+
+    // Destructor to free memory
+    ~DoublyLinkedList() {
+        Node<T>* current = head;
+        Node<T>* nextNode = nullptr;
+
+        while (current != nullptr) {
+            nextNode = current->next;
+            delete current;
+            current = nextNode;
+        }
+    }
+};
+
+int main() {
+    // Example usage of DoublyLinkedList
+    DoublyLinkedList<int> doublyList;
+    doublyList.insert(1);
+    doublyList.insert(2);
+    doublyList.insert(3);
+
+    cout << "Original List: ";
+    doublyList.display();
+
+    doublyList.reverse();
+
+    cout << "Reversed List: ";
+    doublyList.display();
+
+    return 0;
+}

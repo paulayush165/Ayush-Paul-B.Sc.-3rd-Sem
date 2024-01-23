@@ -1,0 +1,81 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Triplet {
+    int row;
+    int col;
+    int value;
+};
+
+void sparseToNonZero(int rows, int cols, struct Triplet sparse[], int nonZero[][3]) {
+    int nonZeroCount = 0;
+
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            if (sparse[nonZeroCount].row == i && sparse[nonZeroCount].col == j) {
+                nonZero[i][j] = sparse[nonZeroCount].value;
+                nonZeroCount++;
+            } else {
+                nonZero[i][j] = 0;
+            }
+        }
+    }
+}
+
+void nonZeroToSparse(int rows, int cols, int nonZero[][3], struct Triplet sparse[]) {
+    int sparseCount = 0;
+
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            if (nonZero[i][j] != 0) {
+                sparse[sparseCount].row = i;
+                sparse[sparseCount].col = j;
+                sparse[sparseCount].value = nonZero[i][j];
+                sparseCount++;
+            }
+        }
+    }
+}
+
+void displayMatrix(int rows, int cols, int matrix[][cols]) {
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            printf("%d\t", matrix[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+int main() {
+    int rows, cols;
+
+    printf("Enter the number of rows and columns: ");
+    scanf("%d %d", &rows, &cols);
+
+    int nonZero[rows][cols];
+    printf("Enter the elements of the matrix (non-zero form):\n");
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            scanf("%d", &nonZero[i][j]);
+        }
+    }
+
+    printf("Non-zero form matrix:\n");
+    displayMatrix(rows, cols, nonZero);
+
+    struct Triplet sparse[rows * cols];
+    nonZeroToSparse(rows, cols, nonZero, sparse);
+
+    printf("\nSparse matrix representation:\n");
+    for (int i = 0; i < rows * cols; ++i) {
+        printf("(%d, %d, %d)\n", sparse[i].row, sparse[i].col, sparse[i].value);
+    }
+
+    int convertedNonZero[rows][cols];
+    sparseToNonZero(rows, cols, sparse, convertedNonZero);
+
+    printf("\nConverted non-zero form matrix:\n");
+    displayMatrix(rows, cols, convertedNonZero);
+
+    return 0;
+}

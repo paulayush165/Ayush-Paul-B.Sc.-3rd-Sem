@@ -1,0 +1,153 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int data;
+    struct Node* next;
+    struct Node* prev;
+};
+
+struct Deque {
+    struct Node* front;
+    struct Node* rear;
+};
+
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    if (newNode == NULL) {
+        printf("Memory allocation failed\n");
+        exit(EXIT_FAILURE);
+    }
+
+    newNode->data = data;
+    newNode->next = NULL;
+    newNode->prev = NULL;
+
+    return newNode;
+}
+
+void initializeDeque(struct Deque* deque) {
+    deque->front = NULL;
+    deque->rear = NULL;
+}
+
+int isEmpty(struct Deque* deque) {
+    return deque->front == NULL;
+}
+
+void enqueueFront(struct Deque* deque, int data) {
+    struct Node* newNode = createNode(data);
+
+    if (isEmpty(deque)) {
+        deque->front = deque->rear = newNode;
+    } else {
+        newNode->next = deque->front;
+        deque->front->prev = newNode;
+        deque->front = newNode;
+    }
+
+    printf("%d enqueued at the front of the deque\n", data);
+}
+
+void enqueueRear(struct Deque* deque, int data) {
+    struct Node* newNode = createNode(data);
+
+    if (isEmpty(deque)) {
+        deque->front = deque->rear = newNode;
+    } else {
+        newNode->prev = deque->rear;
+        deque->rear->next = newNode;
+        deque->rear = newNode;
+    }
+
+    printf("%d enqueued at the rear of the deque\n", data);
+}
+
+int dequeueFront(struct Deque* deque) {
+    if (isEmpty(deque)) {
+        printf("Deque underflow\n");
+        exit(EXIT_FAILURE);
+    }
+
+    int dequeuedValue = deque->front->data;
+    struct Node* temp = deque->front;
+
+    if (deque->front == deque->rear) {
+        deque->front = deque->rear = NULL;
+    } else {
+        deque->front = deque->front->next;
+        deque->front->prev = NULL;
+    }
+
+    free(temp);
+
+    return dequeuedValue;
+}
+
+int dequeueRear(struct Deque* deque) {
+    if (isEmpty(deque)) {
+        printf("Deque underflow\n");
+        exit(EXIT_FAILURE);
+    }
+
+    int dequeuedValue = deque->rear->data;
+    struct Node* temp = deque->rear;
+
+    if (deque->front == deque->rear) {
+        deque->front = deque->rear = NULL;
+    } else {
+        deque->rear = deque->rear->prev;
+        deque->rear->next = NULL;
+    }
+
+    free(temp);
+
+    return dequeuedValue;
+}
+
+void display(struct Deque* deque) {
+    if (isEmpty(deque)) {
+        printf("Deque is empty\n");
+        return;
+    }
+
+    printf("Deque elements: ");
+    struct Node* current = deque->front;
+    while (current != NULL) {
+        printf("%d ", current->data);
+        current = current->next;
+    }
+    printf("\n");
+}
+
+
+void freeDeque(struct Deque* deque) {
+    struct Node* current = deque->front;
+    struct Node* nextNode = NULL;
+
+    while (current != NULL) {
+        nextNode = current->next;
+        free(current);
+        current = nextNode;
+    }
+
+    initializeDeque(deque);
+}
+
+int main() {
+    struct Deque deque;
+    initializeDeque(&deque);
+
+    enqueueFront(&deque, 1);
+    enqueueRear(&deque, 2);
+    enqueueFront(&deque, 3);
+    display(&deque);
+
+    printf("Dequeued from front: %d\n", dequeueFront(&deque));
+    printf("Dequeued from rear: %d\n", dequeueRear(&deque));
+    display(&deque);
+
+    freeDeque(&deque);
+
+    return 0;
+}

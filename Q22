@@ -1,0 +1,192 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Structure to represent a threaded binary tree node
+struct ThreadedTreeNode {
+    int data;
+    struct ThreadedTreeNode* left;
+    struct ThreadedTreeNode* right;
+    int isThreaded;  // Indicates whether the right pointer is a thread
+};
+
+// Function to create a new threaded binary tree node
+struct ThreadedTreeNode* createThreadedTreeNode(int data) {
+    struct ThreadedTreeNode* newNode = (struct ThreadedTreeNode*)malloc(sizeof(struct ThreadedTreeNode));
+    newNode->data = data;
+    newNode->left = NULL;
+    newNode->right = NULL;
+    newNode->isThreaded = 0;  // Initially, the right pointer is not a thread
+    return newNode;
+}
+
+// Function to perform threaded inorder traversal
+void threadedInorderTraversal(struct ThreadedTreeNode* root) {
+    struct ThreadedTreeNode* current = leftmostNode(root);
+
+    while (current != NULL) {
+        printf("%d ", current->data);
+
+        // If the right child is not a thread, move to the right child
+        if (!current->isThreaded) {
+            current = leftmostNode(current->right);
+        } else {
+            // If the right child is a thread, move to the node connected by the thread
+            current = current->right;
+        }
+    }
+}
+
+// Function to find the leftmost node in a subtree
+struct ThreadedTreeNode* leftmostNode(struct ThreadedTreeNode* node) {
+    if (node == NULL) {
+        return NULL;
+    }
+
+    while (node->left != NULL) {
+        node = node->left;
+    }
+
+    return node;
+}
+
+// Function to find the rightmost node in a subtree
+struct ThreadedTreeNode* rightmostNode(struct ThreadedTreeNode* node) {
+    if (node == NULL) {
+        return NULL;
+    }
+
+    while (!node->isThreaded) {
+        node = node->right;
+    }
+
+    return node;
+}
+
+// Function to find the inorder successor of a node
+struct ThreadedTreeNode* inorderSuccessor(struct ThreadedTreeNode* node) {
+    if (node == NULL) {
+        return NULL;
+    }
+
+    // If the right child is not a thread, the successor is the leftmost node in the right subtree
+    if (!node->isThreaded) {
+        return leftmostNode(node->right);
+    }
+
+    // If the right child is a thread, the successor is the first ancestor whose left child is not the current node
+    struct ThreadedTreeNode* successor = node->right;
+    while (successor != NULL && successor->isThreaded) {
+        successor = successor->right;
+    }
+
+    return successor;
+}
+
+// Function to find the inorder predecessor of a node
+struct ThreadedTreeNode* inorderPredecessor(struct ThreadedTreeNode* node) {
+    if (node == NULL) {
+        return NULL;
+    }
+
+    // If the left child is not a thread, the predecessor is the rightmost node in the left subtree
+    if (node->left != NULL && !node->left->isThreaded) {
+        return rightmostNode(node->left);
+    }
+
+    // If the left child is a thread, the predecessor is the first ancestor whose right child is not the current node
+    struct ThreadedTreeNode* predecessor = node->left;
+    while (predecessor != NULL && predecessor->isThreaded) {
+        predecessor = predecessor->left;
+    }
+
+    return predecessor;
+}
+
+// Function to insert a node into a threaded binary tree
+struct ThreadedTreeNode* insertThreadedNode(struct ThreadedTreeNode* root, int data) {
+    struct ThreadedTreeNode* newNode = createThreadedTreeNode(data);
+
+    if (root == NULL) {
+        return newNode;
+    }
+
+    struct ThreadedTreeNode* current = root;
+    struct ThreadedTreeNode* parent = NULL;
+
+    // Find the appropriate position to insert the node
+    while (current != NULL) {
+        parent = current;
+
+        if (data < current->data) {
+            if (current->left == NULL) {
+                newNode->left = current->left;
+                newNode->right = current;
+                current->left = newNode;
+                current->isThreaded = 1;  // Set the thread flag
+                break;
+            }
+            current = current->left;
+        } else {
+            if (!current->isThreaded) {
+                current = current->right;
+            } else {
+                newNode->left = current;
+                newNode->right = current->right;
+                current->right = newNode;
+                current->isThreaded = 0;  // Reset the thread flag
+                break;
+            }
+        }
+    }
+
+    return (parent == NULL) ? newNode : root;
+}
+
+// Function to free memory occupied by the threaded binary tree
+void freeThreadedBinaryTree(struct ThreadedTreeNode* root) {
+    if (root != NULL) {
+        freeThreadedBinaryTree(root->left);
+
+        if (!root->isThreaded) {
+            freeThreadedBinaryTree(root->right);
+        }
+
+        free(root);
+    }
+}
+
+int main() {
+    struct ThreadedTreeNode* root = NULL;
+
+    // Insert nodes into the threaded binary tree
+    root = insertThreadedNode(root, 20);
+    root = insertThreadedNode(root, 10);
+    root = insertThreadedNode(root, 30);
+    root = insertThreadedNode(root, 5);
+    root = insertThreadedNode(root, 15);
+
+    // Perform threaded inorder traversal
+    printf("Threaded Inorder Traversal: ");
+    threadedInorderTraversal(root);
+    printf("\n");
+
+    // Find and display the inorder successor and predecessor of a node
+    struct ThreadedTreeNode* targetNode = root->left->left;  // Example: Node with value 5
+    struct ThreadedTreeNode* successor = inorderSuccessor(targetNode);
+    struct ThreadedTreeNode* predecessor = inorderPredecessor(targetNode);
+
+    printf("Inorder Successor of %d: %s\n", targetNode->data, (successor != NULL) ? "" : "NULL");
+    if (successor != NULL) {
+        printf("%d\n", successor->data);
+    }
+
+    printf("Inorder Predecessor of %d: %s\n", targetNode->data, (predecessor != NULL) ? "" : "NULL");
+    if (predecessor != NULL) {
+        printf("%d\n", predecessor->data);
+    }
+
+    // Free memory occupied by the threaded binary tree
+    freeThreadedBinaryTree(root);
+
+    return 0;
+}

@@ -1,0 +1,108 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Structure to represent a lower triangular matrix
+struct LowerTriangularMatrix {
+    int* array;
+    int order;
+};
+
+// Function to create a lower triangular matrix
+struct LowerTriangularMatrix* createLowerTriangularMatrix(int order) {
+    struct LowerTriangularMatrix* lowerTriangularMatrix = (struct LowerTriangularMatrix*)malloc(sizeof(struct LowerTriangularMatrix));
+    lowerTriangularMatrix->array = (int*)malloc((order * (order + 1)) / 2 * sizeof(int));
+
+    lowerTriangularMatrix->order = order;
+
+    // Initialize all elements to zero
+    for (int i = 0; i < (order * (order + 1)) / 2; ++i) {
+        lowerTriangularMatrix->array[i] = 0;
+    }
+
+    return lowerTriangularMatrix;
+}
+
+// Function to set the value of an element in the lower triangular matrix
+void setElement(struct LowerTriangularMatrix* lowerTriangularMatrix, int row, int col, int value) {
+    if (row < 0 || row >= lowerTriangularMatrix->order || col < 0 || col >= lowerTriangularMatrix->order) {
+        printf("Invalid index\n");
+        exit(EXIT_FAILURE);
+    }
+
+    if (row >= col) {
+        // Only set values in the lower triangular part
+        lowerTriangularMatrix->array[row * (row + 1) / 2 + col] = value;
+    } else {
+        // Values above the main diagonal are always zero
+        printf("Cannot set values above the main diagonal\n");
+        exit(EXIT_FAILURE);
+    }
+}
+
+// Function to get the value of an element in the lower triangular matrix
+int getElement(struct LowerTriangularMatrix* lowerTriangularMatrix, int row, int col) {
+    if (row < 0 || row >= lowerTriangularMatrix->order || col < 0 || col >= lowerTriangularMatrix->order) {
+        printf("Invalid index\n");
+        exit(EXIT_FAILURE);
+    }
+
+    if (row >= col) {
+        // Only non-zero values in the lower triangular part
+        return lowerTriangularMatrix->array[row * (row + 1) / 2 + col];
+    } else {
+        // Values above the main diagonal are always zero
+        return 0;
+    }
+}
+
+// Function to display the lower triangular matrix
+void displayMatrix(struct LowerTriangularMatrix* lowerTriangularMatrix) {
+    for (int i = 0; i < lowerTriangularMatrix->order; ++i) {
+        for (int j = 0; j < lowerTriangularMatrix->order; ++j) {
+            printf("%d ", getElement(lowerTriangularMatrix, i, j));
+        }
+        printf("\n");
+    }
+}
+
+// Function to free memory occupied by the lower triangular matrix
+void freeLowerTriangularMatrix(struct LowerTriangularMatrix* lowerTriangularMatrix) {
+    free(lowerTriangularMatrix->array);
+    free(lowerTriangularMatrix);
+}
+
+int main() {
+    int order;
+
+    // Input: Order of the lower triangular matrix
+    printf("Enter the order of the lower triangular matrix: ");
+    scanf("%d", &order);
+
+    if (order <= 0) {
+        printf("Please enter a positive order for the lower triangular matrix.\n");
+        return 1;
+    }
+
+    // Create lower triangular matrix
+    struct LowerTriangularMatrix* lowerTriangularMatrix = createLowerTriangularMatrix(order);
+
+    // Input: Set values in the lower triangular matrix
+    printf("Enter values for the lower triangular matrix:\n");
+    for (int i = 0; i < order; ++i) {
+        for (int j = 0; j <= i; ++j) {
+            int value;
+            printf("Enter value for element (%d, %d): ", i, j);
+            scanf("%d", &value);
+            setElement(lowerTriangularMatrix, i, j, value);
+        }
+    }
+
+    // Display lower triangular matrix
+    printf("\nLower Triangular Matrix:\n");
+    displayMatrix(lowerTriangularMatrix);
+
+    // Free memory
+    freeLowerTriangularMatrix(lowerTriangularMatrix);
+
+    return 0;
+}

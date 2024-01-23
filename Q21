@@ -1,0 +1,98 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Structure to represent a symmetric matrix
+struct SymmetricMatrix {
+    int* array;
+    int order;
+};
+
+// Function to create a symmetric matrix
+struct SymmetricMatrix* createSymmetricMatrix(int order) {
+    struct SymmetricMatrix* symmetricMatrix = (struct SymmetricMatrix*)malloc(sizeof(struct SymmetricMatrix));
+    symmetricMatrix->array = (int*)malloc((order * (order + 1)) / 2 * sizeof(int));
+
+    symmetricMatrix->order = order;
+
+    // Initialize all elements to zero
+    for (int i = 0; i < (order * (order + 1)) / 2; ++i) {
+        symmetricMatrix->array[i] = 0;
+    }
+
+    return symmetricMatrix;
+}
+
+// Function to set the value of an element in the symmetric matrix
+void setElement(struct SymmetricMatrix* symmetricMatrix, int row, int col, int value) {
+    if (row < 0 || row >= symmetricMatrix->order || col < 0 || col >= symmetricMatrix->order) {
+        printf("Invalid index\n");
+        exit(EXIT_FAILURE);
+    }
+
+    // Only set values in the lower triangular part (including the main diagonal)
+    symmetricMatrix->array[row * (row + 1) / 2 + col] = value;
+    symmetricMatrix->array[col * (col + 1) / 2 + row] = value;  // Symmetrically set the corresponding element
+}
+
+// Function to get the value of an element in the symmetric matrix
+int getElement(struct SymmetricMatrix* symmetricMatrix, int row, int col) {
+    if (row < 0 || row >= symmetricMatrix->order || col < 0 || col >= symmetricMatrix->order) {
+        printf("Invalid index\n");
+        exit(EXIT_FAILURE);
+    }
+
+    // Retrieve values from the lower triangular part (including the main diagonal)
+    return symmetricMatrix->array[row * (row + 1) / 2 + col];
+}
+
+// Function to display the symmetric matrix
+void displayMatrix(struct SymmetricMatrix* symmetricMatrix) {
+    for (int i = 0; i < symmetricMatrix->order; ++i) {
+        for (int j = 0; j < symmetricMatrix->order; ++j) {
+            printf("%d ", getElement(symmetricMatrix, i, j));
+        }
+        printf("\n");
+    }
+}
+
+// Function to free memory occupied by the symmetric matrix
+void freeSymmetricMatrix(struct SymmetricMatrix* symmetricMatrix) {
+    free(symmetricMatrix->array);
+    free(symmetricMatrix);
+}
+
+int main() {
+    int order;
+
+    // Input: Order of the symmetric matrix
+    printf("Enter the order of the symmetric matrix: ");
+    scanf("%d", &order);
+
+    if (order <= 0) {
+        printf("Please enter a positive order for the symmetric matrix.\n");
+        return 1;
+    }
+
+    // Create symmetric matrix
+    struct SymmetricMatrix* symmetricMatrix = createSymmetricMatrix(order);
+
+    // Input: Set values in the symmetric matrix
+    printf("Enter values for the symmetric matrix:\n");
+    for (int i = 0; i < order; ++i) {
+        for (int j = i; j < order; ++j) {
+            int value;
+            printf("Enter value for element (%d, %d): ", i, j);
+            scanf("%d", &value);
+            setElement(symmetricMatrix, i, j, value);
+        }
+    }
+
+    // Display symmetric matrix
+    printf("\nSymmetric Matrix:\n");
+    displayMatrix(symmetricMatrix);
+
+    // Free memory
+    freeSymmetricMatrix(symmetricMatrix);
+
+    return 0;
+}

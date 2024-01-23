@@ -1,0 +1,160 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Structure to represent a queue
+struct Queue {
+    int front, rear, capacity;
+    int* array;
+};
+
+// Structure to represent a stack
+struct Stack {
+    int top, capacity;
+    int* array;
+};
+
+// Function to initialize a queue
+struct Queue* createQueue(int capacity) {
+    struct Queue* queue = (struct Queue*)malloc(sizeof(struct Queue));
+    queue->front = queue->rear = -1;
+    queue->capacity = capacity;
+    queue->array = (int*)malloc(queue->capacity * sizeof(int));
+    return queue;
+}
+
+// Function to check if the queue is empty
+int isQueueEmpty(struct Queue* queue) {
+    return queue->front == -1;
+}
+
+// Function to check if the queue is full
+int isQueueFull(struct Queue* queue) {
+    return (queue->rear + 1) % queue->capacity == queue->front;
+}
+
+// Function to enqueue an element into the queue
+void enqueue(struct Queue* queue, int data) {
+    if (isQueueFull(queue)) {
+        printf("Queue overflow\n");
+        exit(EXIT_FAILURE);
+    }
+
+    if (isQueueEmpty(queue)) {
+        queue->front = queue->rear = 0;
+    } else {
+        queue->rear = (queue->rear + 1) % queue->capacity;
+    }
+
+    queue->array[queue->rear] = data;
+}
+
+// Function to dequeue an element from the queue
+int dequeue(struct Queue* queue) {
+    if (isQueueEmpty(queue)) {
+        printf("Queue underflow\n");
+        exit(EXIT_FAILURE);
+    }
+
+    int dequeuedElement = queue->array[queue->front];
+
+    if (queue->front == queue->rear) {
+        queue->front = queue->rear = -1;
+    } else {
+        queue->front = (queue->front + 1) % queue->capacity;
+    }
+
+    return dequeuedElement;
+}
+
+// Function to initialize a stack
+struct Stack* createStack(int capacity) {
+    struct Stack* stack = (struct Stack*)malloc(sizeof(struct Stack));
+    stack->top = -1;
+    stack->capacity = capacity;
+    stack->array = (int*)malloc(stack->capacity * sizeof(int));
+    return stack;
+}
+
+// Function to check if the stack is empty
+int isStackEmpty(struct Stack* stack) {
+    return stack->top == -1;
+}
+
+// Function to check if the stack is full
+int isStackFull(struct Stack* stack) {
+    return stack->top == stack->capacity - 1;
+}
+
+// Function to push an element onto the stack
+void push(struct Stack* stack, int data) {
+    if (isStackFull(stack)) {
+        printf("Stack overflow\n");
+        exit(EXIT_FAILURE);
+    }
+
+    stack->array[++stack->top] = data;
+}
+
+// Function to pop an element from the stack
+int pop(struct Stack* stack) {
+    if (isStackEmpty(stack)) {
+        printf("Stack underflow\n");
+        exit(EXIT_FAILURE);
+    }
+
+    return stack->array[stack->top--];
+}
+
+// Function to reverse the order of elements in the stack using an additional queue
+void reverseStack(struct Stack* stack, struct Queue* queue) {
+    while (!isStackEmpty(stack)) {
+        enqueue(queue, pop(stack));
+    }
+
+    while (!isQueueEmpty(queue)) {
+        push(stack, dequeue(queue));
+    }
+}
+
+// Function to display the elements of the stack
+void display(struct Stack* stack) {
+    if (isStackEmpty(stack)) {
+        printf("Stack is empty\n");
+        return;
+    }
+
+    printf("Stack elements: ");
+    for (int i = 0; i <= stack->top; ++i) {
+        printf("%d ", stack->array[i]);
+    }
+    printf("\n");
+}
+
+int main() {
+    struct Stack stack;
+    struct Queue queue;
+
+    // Initialize stack and queue
+    stack = *createStack(100);
+    queue = *createQueue(100);
+
+    // Push elements onto the stack
+    push(&stack, 1);
+    push(&stack, 2);
+    push(&stack, 3);
+    push(&stack, 4);
+    push(&stack, 5);
+
+    // Display original stack
+    printf("Original stack:\n");
+    display(&stack);
+
+    // Reverse the order of elements in the stack using an additional queue
+    reverseStack(&stack, &queue);
+
+    // Display reversed stack
+    printf("\nReversed stack:\n");
+    display(&stack);
+
+    return 0;
+}

@@ -1,0 +1,81 @@
+#include <iostream>
+using namespace std;
+template <typename T, int maxSize>
+class Stack {
+private:
+    T array[maxSize];
+    int top;
+
+public:
+    
+    Stack() : top(-1) {}
+
+   
+    bool isEmpty() const {
+        return top == -1;
+    }
+
+    bool isFull() const {
+        return top == maxSize - 1;
+    }
+
+  
+    void push(T data) {
+        if (isFull()) {
+           cout << "Stack overflow\n";
+            return;
+        }
+
+        array[++top] = data;
+       cout << data << " pushed onto the stack\n";
+    }
+
+   
+    T pop() {
+        if (isEmpty()) {
+            cerr << "Stack underflow\n";
+            exit(EXIT_FAILURE);
+        }
+
+        return array[top--];
+    }
+
+   
+    void display() const {
+        if (isEmpty()) {
+           cout << "Stack is empty\n";
+            return;
+        }
+
+       cout << "Stack elements: ";
+        for (int i = 0; i <= top; ++i) {
+           cout << array[i] << " ";
+        }
+      cout << "\n";
+    }
+};
+
+int main() {
+    
+    Stack<int, 5> intStack;
+
+    intStack.push(1);
+    intStack.push(2);
+    intStack.push(3);
+    intStack.display();
+
+    cout << "Popped element: " << intStack.pop() << endl;
+    intStack.display();
+
+   
+    Stack<double, 3> doubleStack;
+
+    doubleStack.push(1.5);
+    doubleStack.push(2.5);
+    doubleStack.display();
+
+   cout << "Popped element: " << doubleStack.pop() << endl;
+    doubleStack.display();
+
+    return 0;
+}

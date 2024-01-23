@@ -1,0 +1,98 @@
+#include <iostream>
+using namespace std;
+template <typename T, int maxSize>
+class CircularQueue {
+private:
+    T array[maxSize];
+    int front, rear;
+
+public:
+   
+    CircularQueue() : front(-1), rear(-1) {}
+
+   
+    bool isEmpty() const {
+        return front == -1 && rear == -1;
+    }
+
+   
+    bool isFull() const {
+        return (rear + 1) % maxSize == front;
+    }
+
+   
+    void enqueue(T data) {
+        if (isFull()) {
+            std::cout << "Queue overflow\n";
+            return;
+        }
+
+        if (isEmpty()) {
+            front = rear = 0;
+        } else {
+            rear = (rear + 1) % maxSize;
+        }
+
+        array[rear] = data;
+        cout << data << " enqueued into the queue\n";
+    }
+
+   
+    T dequeue() {
+        if (isEmpty()) {
+            cerr << "Queue underflow\n";
+            exit(EXIT_FAILURE);
+        }
+
+        T dequeuedElement = array[front];
+
+        if (front == rear) {
+            front = rear = -1;
+        } else {
+            front = (front + 1) % maxSize;
+        }
+
+        return dequeuedElement;
+    }
+
+  
+    void display() const {
+        if (isEmpty()) {
+            cout << "Queue is empty\n";
+            return;
+        }
+
+        cout << "Queue elements: ";
+        int i = front;
+        do {
+            cout << array[i] << " ";
+            i = (i + 1) % maxSize;
+        } while (i != (rear + 1) % maxSize);
+        cout << "\n";
+    }
+};
+
+int main() {
+   
+    CircularQueue<int, 5> intQueue;
+
+    intQueue.enqueue(1);
+    intQueue.enqueue(2);
+    intQueue.enqueue(3);
+    intQueue.display();
+
+    cout << "Dequeued element: " << intQueue.dequeue() << endl;
+    intQueue.display();
+
+   
+    CircularQueue<double, 3> doubleQueue;
+
+    doubleQueue.enqueue(1.5);
+    doubleQueue.enqueue(2.5);
+    doubleQueue.display();
+
+    cout << "Dequeued element: " << doubleQueue.dequeue() << endl;
+    doubleQueue.display();
+
+    return 0;
+}

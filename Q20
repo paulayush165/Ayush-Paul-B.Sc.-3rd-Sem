@@ -1,0 +1,108 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Structure to represent an upper triangular matrix
+struct UpperTriangularMatrix {
+    int* array;
+    int order;
+};
+
+// Function to create an upper triangular matrix
+struct UpperTriangularMatrix* createUpperTriangularMatrix(int order) {
+    struct UpperTriangularMatrix* upperTriangularMatrix = (struct UpperTriangularMatrix*)malloc(sizeof(struct UpperTriangularMatrix));
+    upperTriangularMatrix->array = (int*)malloc((order * (order + 1)) / 2 * sizeof(int));
+
+    upperTriangularMatrix->order = order;
+
+    // Initialize all elements to zero
+    for (int i = 0; i < (order * (order + 1)) / 2; ++i) {
+        upperTriangularMatrix->array[i] = 0;
+    }
+
+    return upperTriangularMatrix;
+}
+
+// Function to set the value of an element in the upper triangular matrix
+void setElement(struct UpperTriangularMatrix* upperTriangularMatrix, int row, int col, int value) {
+    if (row < 0 || row >= upperTriangularMatrix->order || col < 0 || col >= upperTriangularMatrix->order) {
+        printf("Invalid index\n");
+        exit(EXIT_FAILURE);
+    }
+
+    if (row <= col) {
+        // Only set values in the upper triangular part
+        upperTriangularMatrix->array[row * (row + 1) / 2 + col] = value;
+    } else {
+        // Values below the main diagonal are always zero
+        printf("Cannot set values below the main diagonal\n");
+        exit(EXIT_FAILURE);
+    }
+}
+
+// Function to get the value of an element in the upper triangular matrix
+int getElement(struct UpperTriangularMatrix* upperTriangularMatrix, int row, int col) {
+    if (row < 0 || row >= upperTriangularMatrix->order || col < 0 || col >= upperTriangularMatrix->order) {
+        printf("Invalid index\n");
+        exit(EXIT_FAILURE);
+    }
+
+    if (row <= col) {
+        // Only non-zero values in the upper triangular part
+        return upperTriangularMatrix->array[row * (row + 1) / 2 + col];
+    } else {
+        // Values below the main diagonal are always zero
+        return 0;
+    }
+}
+
+// Function to display the upper triangular matrix
+void displayMatrix(struct UpperTriangularMatrix* upperTriangularMatrix) {
+    for (int i = 0; i < upperTriangularMatrix->order; ++i) {
+        for (int j = 0; j < upperTriangularMatrix->order; ++j) {
+            printf("%d ", getElement(upperTriangularMatrix, i, j));
+        }
+        printf("\n");
+    }
+}
+
+// Function to free memory occupied by the upper triangular matrix
+void freeUpperTriangularMatrix(struct UpperTriangularMatrix* upperTriangularMatrix) {
+    free(upperTriangularMatrix->array);
+    free(upperTriangularMatrix);
+}
+
+int main() {
+    int order;
+
+    // Input: Order of the upper triangular matrix
+    printf("Enter the order of the upper triangular matrix: ");
+    scanf("%d", &order);
+
+    if (order <= 0) {
+        printf("Please enter a positive order for the upper triangular matrix.\n");
+        return 1;
+    }
+
+    // Create upper triangular matrix
+    struct UpperTriangularMatrix* upperTriangularMatrix = createUpperTriangularMatrix(order);
+
+    // Input: Set values in the upper triangular matrix
+    printf("Enter values for the upper triangular matrix:\n");
+    for (int i = 0; i < order; ++i) {
+        for (int j = i; j < order; ++j) {
+            int value;
+            printf("Enter value for element (%d, %d): ", i, j);
+            scanf("%d", &value);
+            setElement(upperTriangularMatrix, i, j, value);
+        }
+    }
+
+    // Display upper triangular matrix
+    printf("\nUpper Triangular Matrix:\n");
+    displayMatrix(upperTriangularMatrix);
+
+    // Free memory
+    freeUpperTriangularMatrix(upperTriangularMatrix);
+
+    return 0;
+}
